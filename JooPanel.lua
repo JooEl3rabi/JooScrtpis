@@ -1,4 +1,4 @@
--- [[ DragonHell Panel V3.1 - Premium Edition ]] --
+-- [[ DragonHell Panel V3.3 - Precision Edition ]] --
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
@@ -15,15 +15,15 @@ screenGui.Name = "DragonHellGui"
 screenGui.Parent = game:GetService("CoreGui")
 screenGui.ResetOnSpawn = false
 
--- [[ العلامة المائية - DragonHell ]] --
+-- [[ العلامة المائية الجديدة بالنص المطلوب بدقة ]] --
 local watermark = Instance.new("TextLabel")
-watermark.Size = UDim2.new(0, 600, 0, 100)
-watermark.Position = UDim2.new(0.5, -300, 0.45, 0)
+watermark.Size = UDim2.new(0, 800, 0, 100)
+watermark.Position = UDim2.new(0.5, -400, 0.45, 0)
 watermark.BackgroundTransparency = 1
 watermark.TextColor3 = Color3.fromRGB(255, 255, 255)
-watermark.Text = "DragonHell activated!" -- الاسم الجديد هنا
+watermark.Text = "DragonHell Panel Activated!" -- النص كما طلبته بالضبط
 watermark.Font = Enum.Font.GothamBlack
-watermark.TextSize = 48 -- تكبير الخط للاسم الجديد
+watermark.TextSize = 42
 watermark.TextTransparency = 1
 watermark.Parent = screenGui
 
@@ -37,35 +37,27 @@ local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 240, 0, 300)
 mainFrame.Position = UDim2.new(0.5, -120, 0.35, 0)
 mainFrame.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
-mainFrame.Active = true
-mainFrame.Draggable = true
-mainFrame.BackgroundTransparency = 1
-mainFrame.ClipsDescendants = true
-mainFrame.Parent = screenGui
+mainFrame.Active = true; mainFrame.Draggable = true
+mainFrame.BackgroundTransparency = 1; mainFrame.ClipsDescendants = true; mainFrame.Parent = screenGui
 
 local mainCorner = Instance.new("UICorner", mainFrame)
 mainCorner.CornerRadius = UDim.new(0, 20)
 
 local mainStroke = Instance.new("UIStroke", mainFrame)
-mainStroke.Color = Color3.fromRGB(0, 255, 255)
-mainStroke.Thickness = 3
-mainStroke.Transparency = 1
+mainStroke.Color = Color3.fromRGB(0, 255, 255); mainStroke.Thickness = 3; mainStroke.Transparency = 1
 
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 60)
-title.Text = "DRAGONHELL" -- العنوان الجديد
+title.Text = "DRAGONHELL"
 title.TextColor3 = Color3.fromRGB(0, 255, 255)
-title.Font = Enum.Font.GothamBlack
-title.TextSize = 24
-title.BackgroundTransparency = 1
-title.TextTransparency = 1
-title.Parent = mainFrame
+title.Font = Enum.Font.GothamBlack; title.TextSize = 24
+title.BackgroundTransparency = 1; title.TextTransparency = 1; title.Parent = mainFrame
 
--- [[ تسلسل الأنيميشن ]] --
+-- [[ أنيميشن الدخول ]] --
 task.spawn(function()
     TweenService:Create(watermark, TweenInfo.new(0.8), {TextTransparency = 0}):Play()
     TweenService:Create(wmStroke, TweenInfo.new(0.8), {Transparency = 0.5}):Play()
-    task.wait(2.2)
+    task.wait(2.5)
     TweenService:Create(watermark, TweenInfo.new(0.6), {TextTransparency = 1}):Play()
     TweenService:Create(wmStroke, TweenInfo.new(0.6), {Transparency = 1}):Play()
     task.wait(0.6)
@@ -74,18 +66,25 @@ task.spawn(function()
     TweenService:Create(title, TweenInfo.new(0.6), {TextTransparency = 0}):Play()
 end)
 
--- دالة الأزرار الموحدة
+-- دالة إصلاح التصادم (FIX)
+local function fixCollision()
+    local char = player.Character
+    if char then
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then part.CanCollide = true end
+        end
+    end
+end
+
+-- دالة إنشاء الأزرار
 local function createButton(text, pos, color)
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.85, 0, 0, 50)
-    btn.Position = pos
-    btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    btn.Size = UDim2.new(0.85, 0, 0, 50); btn.Position = pos; btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     btn.Text = text; btn.TextColor3 = Color3.fromRGB(255, 255, 255); btn.Font = Enum.Font.GothamBold; btn.TextSize = 18
     btn.TextTransparency = 1; btn.BackgroundTransparency = 1; btn.Parent = mainFrame
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 12)
-    local s = Instance.new("UIStroke", btn)
-    s.Color = color; s.Thickness = 2; s.Transparency = 1
-    task.delay(3.5, function()
+    local s = Instance.new("UIStroke", btn); s.Color = color; s.Thickness = 2; s.Transparency = 1
+    task.delay(3.8, function()
         TweenService:Create(btn, TweenInfo.new(0.5), {TextTransparency = 0, BackgroundTransparency = 0}):Play()
         TweenService:Create(s, TweenInfo.new(0.5), {Transparency = 0}):Play()
     end)
@@ -95,30 +94,11 @@ end
 local noclipBtn, noclipStroke = createButton("NOCLIP: OFF", UDim2.new(0.075, 0, 0.22, 0), Color3.fromRGB(255, 0, 50))
 local flyBtn, flyStroke = createButton("FLY: OFF", UDim2.new(0.075, 0, 0.42, 0), Color3.fromRGB(0, 150, 255))
 
--- سلايدر السرعة
-local speedLabel = Instance.new("TextLabel")
-speedLabel.Size = UDim2.new(1, 0, 0, 30); speedLabel.Position = UDim2.new(0, 0, 0.65, 0)
-speedLabel.Text = "SPEED: 16"; speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255); speedLabel.Font = Enum.Font.GothamBlack; speedLabel.TextSize = 20; speedLabel.BackgroundTransparency = 1; speedLabel.TextTransparency = 1; speedLabel.Parent = mainFrame
-
-local track = Instance.new("Frame")
-track.Size = UDim2.new(0.8, 0, 0, 10); track.Position = UDim2.new(0.1, 0, 0.85, 0); track.BackgroundColor3 = Color3.fromRGB(40, 40, 40); track.BackgroundTransparency = 1; track.Parent = mainFrame
-Instance.new("UICorner", track)
-
-local knob = Instance.new("TextButton")
-knob.Size = UDim2.new(0, 26, 0, 26); knob.Position = UDim2.new(0, 0, 0.5, -13); knob.BackgroundColor3 = Color3.fromRGB(0, 255, 255); knob.Text = ""; knob.BackgroundTransparency = 1; knob.Parent = track
-Instance.new("UICorner", knob).CornerRadius = UDim.new(1, 0)
-
-task.delay(3.5, function()
-    TweenService:Create(speedLabel, TweenInfo.new(0.5), {TextTransparency = 0}):Play()
-    TweenService:Create(track, TweenInfo.new(0.5), {BackgroundTransparency = 0}):Play()
-    TweenService:Create(knob, TweenInfo.new(0.5), {BackgroundTransparency = 0}):Play()
-end)
-
--- [[ التحكم البرمجي ]] --
 noclipBtn.MouseButton1Click:Connect(function()
     noclipEnabled = not noclipEnabled
     noclipBtn.Text = noclipEnabled and "NOCLIP: ON" or "NOCLIP: OFF"
     noclipStroke.Color = noclipEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 50)
+    if not noclipEnabled then fixCollision() end
 end)
 
 local bg = Instance.new("BodyGyro"); local bv = Instance.new("BodyVelocity")
@@ -133,8 +113,24 @@ flyBtn.MouseButton1Click:Connect(function()
         if root then bg.Parent = root; bv.Parent = root; player.Character.Humanoid:PlatformStand(true) end
     else
         bg.Parent = nil; bv.Parent = nil
-        if player.Character then player.Character.Humanoid:PlatformStand(false) end
+        if player.Character then player.Character.Humanoid:PlatformStand(false); fixCollision() end
     end
+end)
+
+-- سلايدر السرعة
+local speedLabel = Instance.new("TextLabel")
+speedLabel.Size = UDim2.new(1, 0, 0, 30); speedLabel.Position = UDim2.new(0, 0, 0.65, 0)
+speedLabel.Text = "SPEED: 16"; speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255); speedLabel.Font = Enum.Font.GothamBlack; speedLabel.TextSize = 20; speedLabel.BackgroundTransparency = 1; speedLabel.TextTransparency = 1; speedLabel.Parent = mainFrame
+local track = Instance.new("Frame")
+track.Size = UDim2.new(0.8, 0, 0, 10); track.Position = UDim2.new(0.1, 0, 0.85, 0); track.BackgroundColor3 = Color3.fromRGB(40, 40, 40); track.BackgroundTransparency = 1; track.Parent = mainFrame
+local knob = Instance.new("TextButton")
+knob.Size = UDim2.new(0, 26, 0, 26); knob.Position = UDim2.new(0, 0, 0.5, -13); knob.BackgroundColor3 = Color3.fromRGB(0, 255, 255); knob.Text = ""; knob.BackgroundTransparency = 1; knob.Parent = track
+Instance.new("UICorner", knob).CornerRadius = UDim.new(1, 0)
+
+task.delay(3.8, function()
+    TweenService:Create(speedLabel, TweenInfo.new(0.5), {TextTransparency = 0}):Play()
+    TweenService:Create(track, TweenInfo.new(0.5), {BackgroundTransparency = 0}):Play()
+    TweenService:Create(knob, TweenInfo.new(0.5), {BackgroundTransparency = 0}):Play()
 end)
 
 local dragging = false
@@ -152,7 +148,9 @@ end)
 RunService.Stepped:Connect(function()
     local char = player.Character
     if char then
-        if noclipEnabled then for _, p in pairs(char:GetDescendants()) do if p:IsA("BasePart") then p.CanCollide = false end end end
+        if noclipEnabled then
+            for _, p in pairs(char:GetDescendants()) do if p:IsA("BasePart") then p.CanCollide = false end end
+        end
         if flying and char:FindFirstChild("HumanoidRootPart") then
             local dir = Vector3.new(0,0,0)
             if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir = dir + camera.CFrame.LookVector end
