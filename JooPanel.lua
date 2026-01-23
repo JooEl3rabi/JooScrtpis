@@ -1,4 +1,4 @@
--- [[ DragonHell Panel V3.3 - Precision Edition ]] --
+-- [[ DragonHell Panel V3.3.1 - Visual Update ]] --
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
@@ -15,13 +15,13 @@ screenGui.Name = "DragonHellGui"
 screenGui.Parent = game:GetService("CoreGui")
 screenGui.ResetOnSpawn = false
 
--- [[ العلامة المائية الجديدة بالنص المطلوب بدقة ]] --
+-- [[ العلامة المائية عند التفعيل ]] --
 local watermark = Instance.new("TextLabel")
 watermark.Size = UDim2.new(0, 800, 0, 100)
 watermark.Position = UDim2.new(0.5, -400, 0.45, 0)
 watermark.BackgroundTransparency = 1
 watermark.TextColor3 = Color3.fromRGB(255, 255, 255)
-watermark.Text = "DragonHell Panel Activated!" -- النص كما طلبته بالضبط
+watermark.Text = "DragonHell Panel Activated!" -- النص كما طلبته بدقة
 watermark.Font = Enum.Font.GothamBlack
 watermark.TextSize = 42
 watermark.TextTransparency = 1
@@ -48,7 +48,7 @@ mainStroke.Color = Color3.fromRGB(0, 255, 255); mainStroke.Thickness = 3; mainSt
 
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 60)
-title.Text = "DRAGONHELL"
+title.Text = "DRAGON.HELL" -- تم تعديل الاسم هنا
 title.TextColor3 = Color3.fromRGB(0, 255, 255)
 title.Font = Enum.Font.GothamBlack; title.TextSize = 24
 title.BackgroundTransparency = 1; title.TextTransparency = 1; title.Parent = mainFrame
@@ -66,7 +66,7 @@ task.spawn(function()
     TweenService:Create(title, TweenInfo.new(0.6), {TextTransparency = 0}):Play()
 end)
 
--- دالة إصلاح التصادم (FIX)
+-- دالة إصلاح التصادم
 local function fixCollision()
     local char = player.Character
     if char then
@@ -91,13 +91,15 @@ local function createButton(text, pos, color)
     return btn, s
 end
 
-local noclipBtn, noclipStroke = createButton("NOCLIP: OFF", UDim2.new(0.075, 0, 0.22, 0), Color3.fromRGB(255, 0, 50))
+-- تم تغيير اللون الافتراضي للـ Wallhack للأزرق هنا
+local noclipBtn, noclipStroke = createButton("WALLHACK: OFF", UDim2.new(0.075, 0, 0.22, 0), Color3.fromRGB(0, 150, 255))
 local flyBtn, flyStroke = createButton("FLY: OFF", UDim2.new(0.075, 0, 0.42, 0), Color3.fromRGB(0, 150, 255))
 
 noclipBtn.MouseButton1Click:Connect(function()
     noclipEnabled = not noclipEnabled
-    noclipBtn.Text = noclipEnabled and "NOCLIP: ON" or "NOCLIP: OFF"
-    noclipStroke.Color = noclipEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 50)
+    noclipBtn.Text = noclipEnabled and "WALLHACK: ON" or "WALLHACK: OFF"
+    -- عند التفعيل يصبح أخضر، وعند الإغلاق يعود للأزرق
+    noclipStroke.Color = noclipEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(0, 150, 255)
     if not noclipEnabled then fixCollision() end
 end)
 
