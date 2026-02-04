@@ -1,4 +1,4 @@
--- [[ DragonHell Panel V3.3.1 - Visual Update ]] --
+-- [[ DragonHell Panel V3.3.1 - Mobile Master Fix ]] --
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
@@ -15,68 +15,42 @@ screenGui.Name = "DragonHellGui"
 screenGui.Parent = game:GetService("CoreGui")
 screenGui.ResetOnSpawn = false
 
--- [[ العلامة المائية عند التفعيل ]] --
+-- [[ العلامة المائية ]] --
 local watermark = Instance.new("TextLabel")
-watermark.Size = UDim2.new(0, 800, 0, 100)
-watermark.Position = UDim2.new(0.5, -400, 0.45, 0)
-watermark.BackgroundTransparency = 1
-watermark.TextColor3 = Color3.fromRGB(255, 255, 255)
-watermark.Text = "DragonHell Panel Activated!" -- النص كما طلبته بدقة
-watermark.Font = Enum.Font.GothamBlack
-watermark.TextSize = 42
-watermark.TextTransparency = 1
-watermark.Parent = screenGui
-
-local wmStroke = Instance.new("UIStroke", watermark)
-wmStroke.Color = Color3.fromRGB(0, 255, 255)
-wmStroke.Thickness = 2
-wmStroke.Transparency = 1
+watermark.Size = UDim2.new(0, 800, 0, 100); watermark.Position = UDim2.new(0.5, -400, 0.45, 0)
+watermark.BackgroundTransparency = 1; watermark.TextColor3 = Color3.fromRGB(255, 255, 255)
+watermark.Text = "DragonHell Panel Activated!"; watermark.Font = Enum.Font.GothamBlack; watermark.TextSize = 42
+watermark.TextTransparency = 1; watermark.Parent = screenGui
+local wmStroke = Instance.new("UIStroke", watermark); wmStroke.Color = Color3.fromRGB(0, 255, 255); wmStroke.Thickness = 2; wmStroke.Transparency = 1
 
 -- [[ اللوحة الرئيسية ]] --
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 240, 0, 300)
-mainFrame.Position = UDim2.new(0.5, -120, 0.35, 0)
-mainFrame.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
-mainFrame.Active = true; mainFrame.Draggable = true
+mainFrame.Size = UDim2.new(0, 240, 0, 300); mainFrame.Position = UDim2.new(0.5, -120, 0.35, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(5, 5, 5); mainFrame.Active = true; mainFrame.Draggable = true
 mainFrame.BackgroundTransparency = 1; mainFrame.ClipsDescendants = true; mainFrame.Parent = screenGui
-
-local mainCorner = Instance.new("UICorner", mainFrame)
-mainCorner.CornerRadius = UDim.new(0, 20)
-
-local mainStroke = Instance.new("UIStroke", mainFrame)
-mainStroke.Color = Color3.fromRGB(0, 255, 255); mainStroke.Thickness = 3; mainStroke.Transparency = 1
+local mainCorner = Instance.new("UICorner", mainFrame); mainCorner.CornerRadius = UDim.new(0, 20)
+local mainStroke = Instance.new("UIStroke", mainFrame); mainStroke.Color = Color3.fromRGB(0, 255, 255); mainStroke.Thickness = 3; mainStroke.Transparency = 1
 
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 60)
-title.Text = "DRAGON.HELL" -- تم تعديل الاسم هنا
-title.TextColor3 = Color3.fromRGB(0, 255, 255)
-title.Font = Enum.Font.GothamBlack; title.TextSize = 24
-title.BackgroundTransparency = 1; title.TextTransparency = 1; title.Parent = mainFrame
+title.Size = UDim2.new(1, 0, 0, 60); title.Text = "DRAGON.HELL"; title.TextColor3 = Color3.fromRGB(0, 255, 255)
+title.Font = Enum.Font.GothamBlack; title.TextSize = 24; title.BackgroundTransparency = 1; title.TextTransparency = 1; title.Parent = mainFrame
 
 -- [[ أنيميشن الدخول ]] --
 task.spawn(function()
     TweenService:Create(watermark, TweenInfo.new(0.8), {TextTransparency = 0}):Play()
     TweenService:Create(wmStroke, TweenInfo.new(0.8), {Transparency = 0.5}):Play()
-    task.wait(2.5)
-    TweenService:Create(watermark, TweenInfo.new(0.6), {TextTransparency = 1}):Play()
+    task.wait(2.5); TweenService:Create(watermark, TweenInfo.new(0.6), {TextTransparency = 1}):Play()
     TweenService:Create(wmStroke, TweenInfo.new(0.6), {Transparency = 1}):Play()
-    task.wait(0.6)
-    TweenService:Create(mainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Quart), {BackgroundTransparency = 0.1, Position = UDim2.new(0.5, -120, 0.3, 0)}):Play()
+    task.wait(0.6); TweenService:Create(mainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Quart), {BackgroundTransparency = 0.1, Position = UDim2.new(0.5, -120, 0.3, 0)}):Play()
     TweenService:Create(mainStroke, TweenInfo.new(0.6), {Transparency = 0}):Play()
     TweenService:Create(title, TweenInfo.new(0.6), {TextTransparency = 0}):Play()
 end)
 
--- دالة إصلاح التصادم
 local function fixCollision()
     local char = player.Character
-    if char then
-        for _, part in pairs(char:GetDescendants()) do
-            if part:IsA("BasePart") then part.CanCollide = true end
-        end
-    end
+    if char then for _, part in pairs(char:GetDescendants()) do if part:IsA("BasePart") then part.CanCollide = true end end end
 end
 
--- دالة إنشاء الأزرار
 local function createButton(text, pos, color)
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(0.85, 0, 0, 50); btn.Position = pos; btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
@@ -91,14 +65,12 @@ local function createButton(text, pos, color)
     return btn, s
 end
 
--- تم تغيير اللون الافتراضي للـ Wallhack للأزرق هنا
 local noclipBtn, noclipStroke = createButton("WALLHACK: OFF", UDim2.new(0.075, 0, 0.22, 0), Color3.fromRGB(0, 150, 255))
 local flyBtn, flyStroke = createButton("FLY: OFF", UDim2.new(0.075, 0, 0.42, 0), Color3.fromRGB(0, 150, 255))
 
 noclipBtn.MouseButton1Click:Connect(function()
     noclipEnabled = not noclipEnabled
     noclipBtn.Text = noclipEnabled and "WALLHACK: ON" or "WALLHACK: OFF"
-    -- عند التفعيل يصبح أخضر، وعند الإغلاق يعود للأزرق
     noclipStroke.Color = noclipEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(0, 150, 255)
     if not noclipEnabled then fixCollision() end
 end)
@@ -119,7 +91,6 @@ flyBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- سلايدر السرعة
 local speedLabel = Instance.new("TextLabel")
 speedLabel.Size = UDim2.new(1, 0, 0, 30); speedLabel.Position = UDim2.new(0, 0, 0.65, 0)
 speedLabel.Text = "SPEED: 16"; speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255); speedLabel.Font = Enum.Font.GothamBlack; speedLabel.TextSize = 20; speedLabel.BackgroundTransparency = 1; speedLabel.TextTransparency = 1; speedLabel.Parent = mainFrame
@@ -135,32 +106,65 @@ task.delay(3.8, function()
     TweenService:Create(knob, TweenInfo.new(0.5), {BackgroundTransparency = 0}):Play()
 end)
 
+-- [[ إصلاح السلايدر ]] --
 local dragging = false
-knob.MouseButton1Down:Connect(function() dragging = true end)
-UserInputService.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end end)
+local function updateSlider(input)
+    local pos = input.Position.X
+    local percent = math.clamp((pos - track.AbsolutePosition.X) / track.AbsoluteSize.X, 0, 1)
+    knob.Position = UDim2.new(percent, -13, 0.5, -13)
+    currentSpeed = math.floor(16 + (percent * 484))
+    speedLabel.Text = "SPEED: " .. currentSpeed
+    if player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.WalkSpeed = currentSpeed
+    end
+end
+
+knob.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = true end
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = false end
+end)
 UserInputService.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local percent = math.clamp((input.Position.X - track.AbsolutePosition.X) / track.AbsoluteSize.X, 0, 1)
-        knob.Position = UDim2.new(percent, -13, 0.5, -13)
-        currentSpeed = math.floor(16 + (percent * 484))
-        speedLabel.Text = "SPEED: " .. currentSpeed
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        updateSlider(input)
     end
 end)
 
-RunService.Stepped:Connect(function()
+-- [[ التحكم في الحركة ]] --
+RunService.RenderStepped:Connect(function()
     local char = player.Character
     if char then
+        local humanoid = char:FindFirstChild("Humanoid")
+        local root = char:FindFirstChild("HumanoidRootPart")
+        
+        if humanoid then humanoid.WalkSpeed = currentSpeed end
+        
         if noclipEnabled then
             for _, p in pairs(char:GetDescendants()) do if p:IsA("BasePart") then p.CanCollide = false end end
         end
-        if flying and char:FindFirstChild("HumanoidRootPart") then
-            local dir = Vector3.new(0,0,0)
-            if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir = dir + camera.CFrame.LookVector end
-            if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir = dir - camera.CFrame.LookVector end
-            if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir = dir - camera.CFrame.RightVector end
-            if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir = dir + camera.CFrame.RightVector end
-            bv.Velocity = dir * currentSpeed; bg.CFrame = camera.CFrame
+        
+        if flying and root and humanoid then
+            -- تحويل حركة الـ Joystick لاتجاه الكاميرا (يسمح بالطيران الرأسي)
+            local moveDir = humanoid.MoveDirection
+            if moveDir.Magnitude > 0 then
+                -- السر هنا: بنخلي الاتجاه يعتمد على الكاميرا بالكامل
+                local worldDir = camera.CFrame:VectorToWorldSpace(Vector3.new(
+                    (UserInputService:IsKeyDown(Enum.KeyCode.D) and 1 or 0) - (UserInputService:IsKeyDown(Enum.KeyCode.A) and 1 or 0),
+                    0,
+                    (UserInputService:IsKeyDown(Enum.KeyCode.S) and 1 or 0) - (UserInputService:IsKeyDown(Enum.KeyCode.W) and 1 or 0)
+                ))
+                
+                -- للموبايل (لو مفيش كيبورد، نستخدم اتجاه الكاميرا بناءً على الـ MoveDirection)
+                if moveDir.Magnitude > 0 and worldDir.Magnitude == 0 then
+                    bv.Velocity = camera.CFrame.LookVector * (moveDir.Magnitude * currentSpeed)
+                else
+                    bv.Velocity = worldDir * currentSpeed
+                end
+            else
+                bv.Velocity = Vector3.new(0, 0.1, 0) -- ثبات تام
+            end
+            bg.CFrame = camera.CFrame
         end
-        if char:FindFirstChild("Humanoid") then char.Humanoid.WalkSpeed = currentSpeed end
     end
 end)
