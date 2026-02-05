@@ -1,13 +1,15 @@
--- [[ DragonHell Panel V3.5.1 - Text Scaling Fix ]] --
+-- [[ DragonHell Panel V3.5.7 - Fix Translation & Ghost Scan ]] --
 
 local HttpService = game:GetService("HttpService")
 local fileName = "DragonHellConfig.json"
 
+local originalJumpPower = game:GetService("StarterPlayer").CharacterJumpPower
+local originalJumpHeight = game:GetService("StarterPlayer").CharacterJumpHeight
+local originalUseJumpPower = game:GetService("StarterPlayer").CharacterUseJumpPower
+
 local function saveSettings(lang)
     local data = {language = lang}
-    pcall(function()
-        writefile(fileName, HttpService:JSONEncode(data))
-    end)
+    pcall(function() writefile(fileName, HttpService:JSONEncode(data)) end)
 end
 
 local function loadSettings()
@@ -53,7 +55,7 @@ local TEXT = {
         FLY_OFF = "FLY: OFF",
         SPEED = "SPEED: ",
         FORCE_JUMP = "Force Jump: ",
-        DEATH_ESP = "كشف الاماكن الخطيرة: ",
+        DEATH_ESP = "Danger Detector: ", -- تم إصلاح الترجمة هنا
         PLAYER_ESP = "Players ESP: ",
         ON = "ON",
         OFF = "OFF",
@@ -82,13 +84,13 @@ screenGui.Parent = game:GetService("CoreGui")
 screenGui.ResetOnSpawn = false
 
 local watermark = Instance.new("TextLabel")
-watermark.Size = UDim2.new(0, 1000, 0, 120) -- تكبير مساحة النص
+watermark.Size = UDim2.new(0, 1000, 0, 120)
 watermark.Position = UDim2.new(0.5, -500, 0.45, 0)
 watermark.BackgroundTransparency = 1
 watermark.TextColor3 = Color3.fromRGB(255, 255, 255)
 watermark.Text = TEXT[currentLang].WATERMARK
 watermark.Font = Enum.Font.GothamBlack
-watermark.TextSize = 55 -- تكبير حجم الخط لعيونك
+watermark.TextSize = 55
 watermark.TextTransparency = 1
 watermark.Parent = screenGui
 
@@ -177,7 +179,7 @@ local function createSettingBtn(pos)
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 12)
     local s = Instance.new("UIStroke", btn)
     s.Color = Color3.fromRGB(50, 50, 50)
-    s.Thickness = 1.2
+    s.Thickness = 0.8
     return btn, s
 end
 
@@ -196,25 +198,31 @@ local function updateSettingTexts()
     peStroke.Color = playersEspEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(50, 50, 50)
 end
 
+-- كاشف الأشباح الخارق (Ghost Block Detector)
 local function scanBlock(target)
     if not target or not target:IsA("BasePart") then return end
     local isDangerous = false
     local name = target.Name:lower()
-    local dangerKeywords = {"damage", "brick", "kill", "lava", "hurt", "death", "trap", "fake"}
+    local dangerKeywords = {"damage", "brick", "kill", "lava", "hurt", "death", "trap", "fake", "void", "fall", "spike", "acid"}
+    
     for _, word in pairs(dangerKeywords) do if name:find(word) then isDangerous = true break end end
+    
     if not isDangerous then
         if target:FindFirstChildOfClass("TouchTransmitter") or target:FindFirstChildOfClass("Script") then
             isDangerous = true
-            local safeWords = {"floor", "base", "spawn", "check", "stage"}
+            local safeWords = {"floor", "base", "spawn", "check", "stage", "lobby", "part"}
             for _, word in pairs(safeWords) do if name:find(word) then isDangerous = false break end end
         end
     end
-    if target.Transparency > 0.05 and target.Transparency < 1 then isDangerous = true end
+    
+    -- فحص الشفافية أو انعدام التصادم (البلوكات الوهمية)
+    if target.Transparency > 0.2 or target.CanCollide == false then isDangerous = true end
+
     if target:FindFirstChild("ScanH") then target.ScanH:Destroy() end
     local h = Instance.new("Highlight")
     h.Name = "ScanH"
     h.OutlineColor = Color3.fromRGB(255, 255, 255)
-    h.FillTransparency = 0.2
+    h.FillTransparency = 0.3
     h.FillColor = isDangerous and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(0, 255, 0)
     h.Parent = target
     task.delay(3, function() if h then h:Destroy() end end)
@@ -224,11 +232,27 @@ UserInputService.InputBegan:Connect(function(input, processed)
     if processed or not deathEspEnabled then return end
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         local unitRay = camera:ScreenPointToRay(input.Position.X, input.Position.Y)
-        local raycastParams = RaycastParams.new()
-        raycastParams.FilterType = Enum.RaycastFilterType.Exclude
-        raycastParams.FilterDescendantsInstances = {player.Character}
-        local raycastResult = workspace:Raycast(unitRay.Origin, unitRay.Direction * 10000, raycastParams)
-        if raycastResult and raycastResult.Instance then scanBlock(raycastResult.Instance) end
+        
+        -- تقنية الـ Raycast المتغلغل (Penetration Scan)
+        local params = RaycastParams.new()
+        params.FilterType = Enum.RaycastFilterType.Exclude
+        params.FilterDescendantsInstances = {player.Character}
+        -- جعل الشعاع لا يتجاهل البلوكات الشفافة أو التي لا تحتوي على تصادم
+        params.RespectCanCollide = false 
+        
+        local result = workspace:Raycast(unitRay.Origin, unitRay.Direction * 2000, params)
+        if result then
+            scanBlock(result.Instance)
+        else
+            -- محرك البحث العميق في حال فشل الـ Raycast التقليدي
+            local mousePos = player:GetMouse().Hit.p
+            for _, obj in pairs(workspace:GetPartBoundsInRadius(mousePos, 5)) do
+                if obj:IsA("BasePart") and obj.Parent ~= player.Character then
+                    scanBlock(obj)
+                    break
+                end
+            end
+        end
     end
 end)
 
@@ -236,7 +260,7 @@ fjBtn.MouseButton1Click:Connect(function()
     forceJumpEnabled = not forceJumpEnabled 
     if not forceJumpEnabled and player.Character and player.Character:FindFirstChild("Humanoid") then
         local h = player.Character.Humanoid
-        h.JumpPower = 0 h.JumpHeight = 0 h.UseJumpPower = true
+        h.JumpPower = originalJumpPower h.JumpHeight = originalJumpHeight h.UseJumpPower = originalUseJumpPower
     end
     updateSettingTexts() 
 end)
@@ -292,7 +316,7 @@ local function createButton(text, pos, color)
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 12)
     local s = Instance.new("UIStroke", btn)
     s.Color = color
-    s.Thickness = 1.5
+    s.Thickness = 0.8
     s.Transparency = 1
     task.delay(3.8, function()
         TweenService:Create(btn, TweenInfo.new(0.5), {TextTransparency = 0, BackgroundTransparency = 0}):Play()
@@ -304,29 +328,42 @@ end
 local noclipBtn, noclipStroke = createButton(TEXT[currentLang].WALL_OFF, UDim2.new(0.075, 0, 0.22, 0), Color3.fromRGB(0, 150, 255))
 local flyBtn, flyStroke = createButton(TEXT[currentLang].FLY_OFF, UDim2.new(0.075, 0, 0.42, 0), Color3.fromRGB(0, 150, 255))
 
-noclipBtn.MouseButton1Click:Connect(function()
-    noclipEnabled = not noclipEnabled
-    noclipBtn.Text = noclipEnabled and TEXT[currentLang].WALL_ON or TEXT[currentLang].WALL_OFF
-    noclipStroke.Color = noclipEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(0, 150, 255)
-    if not noclipEnabled then fixCollision() end
-end)
+local function updateFlyUI()
+    flyBtn.Text = flying and TEXT[currentLang].FLY_ON or TEXT[currentLang].FLY_OFF
+    flyStroke.Color = flying and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(0, 150, 255)
+end
 
 local bg = Instance.new("BodyGyro")
 local bv = Instance.new("BodyVelocity")
 bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
 bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
 
+local function startFly()
+    if not flying or not player.Character then return end
+    local root = player.Character:FindFirstChild("HumanoidRootPart")
+    local hum = player.Character:FindFirstChild("Humanoid")
+    if root and hum then bg.Parent = root bv.Parent = root hum:PlatformStand(true) end
+end
+
 flyBtn.MouseButton1Click:Connect(function()
     flying = not flying
-    flyBtn.Text = flying and TEXT[currentLang].FLY_ON or TEXT[currentLang].FLY_OFF
-    flyStroke.Color = flying and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(0, 150, 255)
-    if flying and player.Character then
-        local root = player.Character:FindFirstChild("HumanoidRootPart")
-        if root then bg.Parent = root bv.Parent = root player.Character.Humanoid:PlatformStand(true) end
-    else
+    updateFlyUI()
+    if flying then startFly() else
         bg.Parent = nil bv.Parent = nil
-        if player.Character then player.Character.Humanoid:PlatformStand(false) fixCollision() end
+        if player.Character and player.Character:FindFirstChild("Humanoid") then player.Character.Humanoid:PlatformStand(false) fixCollision() end
     end
+end)
+
+player.CharacterAdded:Connect(function(char)
+    task.wait(0.5)
+    if flying then startFly() updateFlyUI() end
+end)
+
+noclipBtn.MouseButton1Click:Connect(function()
+    noclipEnabled = not noclipEnabled
+    noclipBtn.Text = noclipEnabled and TEXT[currentLang].WALL_ON or TEXT[currentLang].WALL_OFF
+    noclipStroke.Color = noclipEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(0, 150, 255)
+    if not noclipEnabled then fixCollision() end
 end)
 
 local speedLabel = Instance.new("TextLabel")
@@ -406,7 +443,7 @@ end)
 local function applyLanguage()
     title.Text = TEXT[currentLang].TITLE
     noclipBtn.Text = noclipEnabled and TEXT[currentLang].WALL_ON or TEXT[currentLang].WALL_OFF
-    flyBtn.Text = flying and TEXT[currentLang].FLY_ON or TEXT[currentLang].FLY_OFF
+    updateFlyUI()
     speedLabel.Text = TEXT[currentLang].SPEED .. currentSpeed
     langBtn.Text = TEXT[currentLang].NEXT_FLAG
     updateSettingTexts()
